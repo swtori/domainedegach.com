@@ -1,0 +1,20 @@
+# Fichiers système
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Fichiers de configuration locaux
+config.local.js
+
+# Images (si volumineuses, utilisez un CDN)
+# images/
+# audio/
+
+# Node modules (si vous ajoutez des dépendances)
+node_modules/
+
+# Fichiers de sauvegarde
+*.bak
+*.backup
