@@ -888,6 +888,11 @@ section {
     margin-top: 0;
 }
 
+/* Margin-top pour le container dans les pages de chambres individuelles */
+.room-detail .container {
+    margin-top: var(--spacing-lg);
+}
+
 /* Fond pour la page Autour du domaine */
 body:has(.around-sections) .room-detail {
     background: linear-gradient(180deg, var(--color-white) 0%, rgba(232, 227, 213, 0.2) 50%, var(--color-white) 100%);
@@ -902,7 +907,7 @@ body:has(.around-sections) .room-detail {
 
 .room-detail-header {
     text-align: center;
-    margin-bottom: var(--spacing-lg);
+    margin-bottom: var(--spacing-sm);
 }
 
 .room-detail-image {
@@ -1340,6 +1345,12 @@ body:has(.around-sections) .room-detail {
     padding-top: var(--spacing-xl);
 }
 
+/* Footer sans marge pour page localiser */
+.map-section + .footer,
+body:has(.map-section) .footer {
+    margin-top: 0;
+}
+
 /* Permettre le scroll sur la page contact pour voir le footer */
 .contact-page {
     overflow: auto;
@@ -1641,6 +1652,16 @@ body:has(.around-sections) .room-detail {
 .map-info > div a:hover {
     color: var(--color-leaf);
     border-bottom-color: var(--color-olive);
+}
+
+/* Bouton dans map-info - texte blanc */
+.map-info .btn-primary {
+    color: var(--color-white) !important;
+}
+
+.map-info .btn-primary:hover {
+    color: var(--color-white) !important;
+    border-bottom: none;
 }
 
 /* Responsive pour page localiser */
