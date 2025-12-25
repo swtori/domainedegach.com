@@ -40,7 +40,7 @@ Vous pouvez répondre directement à cet email pour contacter {{from_name}}.
 ```
 
 4. Dans "Settings", configurez :
-   - **To Email** : e.sarrail@wanadoo.fr
+   - **To Email** : e.sarrail@orange.fr
    - **From Name** : Domaine de Gach
    - **Reply To** : {{reply_to}}
 
@@ -157,4 +157,4 @@ Avant de mettre en ligne :
 
 ## Support
 
-Pour toute question, contactez : e.sarrail@wanadoo.fr
+Pour toute question, contactez : e.sarrail@orange.fr

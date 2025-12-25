@@ -99,7 +99,7 @@ Actions disponibles :
 
 ## Contact
 
-Email : e.sarrail@wanadoo.fr
+Email : e.sarrail@orange.fr
 
 ## Déploiement
 
