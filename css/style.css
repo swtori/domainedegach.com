@@ -169,19 +169,18 @@ a {
 /* Hero Section */
 .hero {
     position: relative;
-    height: 100vh;
-    min-height: 600px;
+    height: calc(100vh - 70px);
+    min-height: calc(600px - 70px);
     background-image: url('../img/img_gach/backgroundGach.jpg');
     background-size: cover;
     background-position: center;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
     text-align: center;
     color: var(--color-white);
     margin-top: 70px;
-    padding-top: calc(15vh + 90px);
-    padding-bottom: 0;
+    padding: 0;
     margin-bottom: 0;
 }
 
@@ -665,12 +664,20 @@ section {
     }
     
     .hero {
-        padding-top: calc(10vh + 40px);
+        height: calc(100vh - 70px);
+        min-height: calc(500px - 70px);
     }
     
     .amenities-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 1rem !important;
+        grid-template-columns: repeat(6, 1fr) !important;
+        gap: 0.75rem !important;
+        overflow-x: auto !important;
+        min-width: 0 !important;
+    }
+    
+    .amenity-item {
+        min-width: 0 !important;
+        flex-shrink: 0 !important;
     }
     
     .amenity-item {
@@ -751,8 +758,48 @@ section {
     gap: var(--spacing-md);
 }
 
-/* Entre 800px et 1200px : 2 colonnes */
-@media (max-width: 1200px) and (min-width: 801px) {
+/* Au-dessus de 1023px : cartes normales */
+@media (min-width: 1024px) {
+    .cards-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: var(--spacing-md) !important;
+    }
+    
+    .card-image {
+        height: 220px !important;
+        margin-bottom: -10px !important;
+    }
+    
+    .card-content {
+        padding: var(--spacing-md) !important;
+        padding-top: calc(var(--spacing-md) + 10px) !important;
+    }
+    
+    .card-content h3 {
+        font-size: 1.3rem !important;
+        margin-bottom: var(--spacing-xs) !important;
+        line-height: 1.2 !important;
+    }
+    
+    .card-content p {
+        font-size: 0.95rem !important;
+        line-height: 1.6 !important;
+        margin-bottom: var(--spacing-xs) !important;
+    }
+    
+    .card-content p:last-of-type {
+        margin-bottom: var(--spacing-sm) !important;
+    }
+    
+    .btn-card {
+        padding: 0.75rem 2rem !important;
+        font-size: 0.95rem !important;
+        margin-top: var(--spacing-xs) !important;
+    }
+}
+
+/* Entre 800px et 1024px : 2 colonnes */
+@media (max-width: 1023px) and (min-width: 801px) {
     .cards-grid {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -1301,12 +1348,37 @@ body:has(.around-sections) .room-detail {
         line-height: 1.7;
     }
 
+    /* Réorganiser l'ordre pour avoir toujours : image, texte, image, texte */
+    .around-section-2 .around-section-text {
+        order: 2;
+    }
+    
+    .around-section-2 .around-section-image {
+        order: 1;
+    }
+    
+    .around-section-4 .around-section-text {
+        order: 2;
+    }
+    
+    .around-section-4 .around-section-image {
+        order: 1;
+    }
+    
+    .around-section-6 .around-section-text {
+        order: 2;
+    }
+    
+    .around-section-6 .around-section-image {
+        order: 1;
+    }
+    
     .around-section-4,
     .around-section-5,
     .around-section-6 {
         justify-content: flex-start !important;
     }
-
+    
     .around-section-4 .around-section-text,
     .around-section-5 .around-section-text,
     .around-section-6 .around-section-text {

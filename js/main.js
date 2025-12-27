@@ -19,6 +19,30 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Fermer le menu en cliquant n'importe où dans le menu
+    if (navMenu) {
+        navMenu.addEventListener('click', function(e) {
+            // Si on clique sur un lien, on laisse le comportement par défaut
+            if (e.target.tagName === 'A') {
+                return;
+            }
+            // Sinon, on ferme le menu
+            navMenu.classList.remove('active');
+            navToggle.classList.remove('active');
+        });
+    }
+
+    // Fermer le menu en cliquant en dehors du menu
+    document.addEventListener('click', function(e) {
+        if (navMenu && navMenu.classList.contains('active')) {
+            // Si le clic est en dehors du menu et du bouton toggle
+            if (!navMenu.contains(e.target) && !navToggle.contains(e.target)) {
+                navMenu.classList.remove('active');
+                navToggle.classList.remove('active');
+            }
+        }
+    });
+
     // Smooth scroll pour les ancres
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
