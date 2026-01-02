@@ -8,7 +8,7 @@ header('Content-Type: application/json');
 
 // Configuration
 $config = [
-    'from_email' => 'e.sarrail@orange.fr',
+    'from_email' => 'contact@domainedegach.com',
     'site_name' => 'Domaine de Gach'
 ];
 

@@ -99,7 +99,7 @@ Actions disponibles :
 
 ## Contact
 
-Email : e.sarrail@orange.fr
+Email : contact@domainedegach.com
 
 ## Déploiement
 

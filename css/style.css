@@ -794,7 +794,7 @@ section {
     .btn-card {
         padding: 0.75rem 2rem !important;
         font-size: 0.95rem !important;
-        margin-top: var(--spacing-xs) !important;
+        margin-top: auto !important;
     }
 }
 
@@ -821,6 +821,7 @@ section {
     overflow: visible;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     transition: var(--transition);
+    height: 100%;
 }
 
 .card:hover {
@@ -854,7 +855,6 @@ section {
     border-radius: 0 0 12px 12px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     flex: 1;
     text-align: center;
     z-index: 1;
@@ -892,7 +892,7 @@ section {
     border: none;
     font-family: var(--font-sans);
     font-size: 0.95rem;
-    margin-top: var(--spacing-xs);
+    margin-top: auto;
 }
 
 .btn-card:hover {
