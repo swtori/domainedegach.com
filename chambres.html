@@ -35,9 +35,12 @@
 
     <main>
         <!-- Section Hero + Cartes -->
-        <section class="hero-rooms">
+        <section class="hero-rooms" style="position: relative;">
             <!-- Background image décoratif -->
-            <div class="hero-rooms-background"></div>
+            <div class="hero-rooms-background" style="background: linear-gradient(135deg, #C3D39A 0%, rgba(195, 211, 154, 0.8) 50%, rgba(232, 227, 213, 0.6) 100%);"></div>
+            
+            <!-- Titre superposé -->
+            <h1 style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); font-family: var(--font-serif); font-size: 3rem; color: var(--color-olive); font-weight: 600; text-align: center; padding: 2rem 0; margin: 0; z-index: 2; width: 100%;">Nos chambres</h1>
             
             <!-- Wrapper des cartes positionné par-dessus -->
             <div class="cards-wrapper">
@@ -45,7 +48,7 @@
                     <!-- Carte 1 : LA SUITE -->
                     <div class="card">
                         <div class="card-image">
-                            <img src="img/img_room/suite/suite_1.jpg" alt="La Suite">
+                            <img src="img/img_room/suite/suite_1.png" alt="La Suite">
                         </div>
                         <div class="card-content">
                             <h3>LA SUITE</h3>
@@ -64,7 +67,7 @@
                             <h3>DENIS</h3>
                             <p>Tonalités douces et décoration « à l'ancienne », idéale pour une escapade en amoureux.</p>
                             <p><strong>À partir de 70€</strong> (basse saison)</p>
-                            <a href="chambre-2.html" class="btn btn-card">Voir plus</a>
+                            <a href="chambre-denis.html" class="btn btn-card">Voir plus</a>
                         </div>
                     </div>
 
@@ -77,7 +80,7 @@
                             <h3>CRÉOLE</h3>
                             <p>Décoration inspirée de la Réunion. Bureau, coin lecture, idéale pour 1, 2 ou 3 personnes.</p>
                             <p><strong>À partir de 70€</strong> (basse saison)</p>
-                            <a href="chambre-3.html" class="btn btn-card">Voir plus</a>
+                            <a href="chambre-creole.html" class="btn btn-card">Voir plus</a>
                         </div>
                     </div>
 
@@ -90,7 +93,7 @@
                             <h3>GEO</h3>
                             <p>Couleurs chaleureuses, terrasse et entrée indépendante.</p>
                             <p><strong>À partir de 70€</strong> (basse saison)</p>
-                            <a href="chambre-4.html" class="btn btn-card">Voir plus</a>
+                            <a href="chambre-geo.html" class="btn btn-card">Voir plus</a>
                         </div>
                     </div>
                 </div>
@@ -110,7 +113,7 @@
                     <!-- Section Piscine avec image -->
                     <div class="piscine-section" style="display: flex; align-items: center; gap: 3rem; margin-bottom: 4rem; background: linear-gradient(135deg, var(--color-beige) 0%, rgba(232, 227, 213, 0.3) 100%); padding: 3rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(107, 122, 71, 0.1);">
                         <div class="piscine-image" style="flex: 0 0 500px; width: 500px; height: 400px; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);">
-                            <img src="img/img_gach/piscine.jpg" alt="Piscine du Domaine de Gach" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                            <img src="img/img_piscine/piscine.png" alt="Piscine du Domaine de Gach" style="width: 100%; height: 100%; object-fit: cover; display: block;">
                         </div>
                         <div class="piscine-content" style="flex: 1; padding: 0;">
                             <h3 style="font-family: var(--font-serif); font-size: 2rem; color: var(--color-olive); margin-bottom: 1rem; font-weight: 600;">Piscine</h3>
