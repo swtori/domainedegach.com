@@ -1124,6 +1124,7 @@ body:has(.around-sections) .room-detail {
     .pricing-table {
         grid-template-columns: 1fr;
         gap: var(--spacing-sm);
+        justify-items: center;
     }
     
     .pricing-item p {
@@ -1156,6 +1157,10 @@ body:has(.around-sections) .room-detail {
     margin: var(--spacing-md) 0;
     box-shadow: 0 4px 20px rgba(107, 122, 71, 0.1);
     border: 1px solid rgba(107, 122, 71, 0.1);
+    /* Toujours centré (desktop + mobile) */
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
 }
 
 .pricing h3 {
@@ -1171,6 +1176,7 @@ body:has(.around-sections) .room-detail {
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: var(--spacing-md);
     margin-top: var(--spacing-md);
+    justify-content: center;
 }
 
 .pricing-item {
@@ -1183,6 +1189,9 @@ body:has(.around-sections) .room-detail {
     border: 2px solid transparent;
     position: relative;
     overflow: hidden;
+    /* Évite l'effet "collé à gauche" en responsive */
+    width: 100%;
+    max-width: 360px;
 }
 
 .pricing-item:hover {

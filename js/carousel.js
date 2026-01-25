@@ -1,6 +1,27 @@
 // Carrousel d'images pour les chambres
 document.addEventListener('DOMContentLoaded', function() {
     const carousels = document.querySelectorAll('.room-carousel');
+
+    // Images responsive (ex: creole_mobile.jpg) via data attributes
+    function applyResponsiveCarouselBackgrounds() {
+        const isMobile = window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
+        document.querySelectorAll('.carousel-image[data-bg-desktop][data-bg-mobile]').forEach(el => {
+            const url = isMobile ? el.dataset.bgMobile : el.dataset.bgDesktop;
+            if (!url) return;
+            // Normaliser au même format que les styles inline existants
+            const nextValue = `url('${url}')`;
+            if (el.style.backgroundImage !== nextValue) {
+                el.style.backgroundImage = nextValue;
+            }
+        });
+    }
+
+    // Debounce léger pour resize/orientation change
+    let responsiveBgTimer = null;
+    function scheduleResponsiveCarouselBackgrounds() {
+        if (responsiveBgTimer) window.clearTimeout(responsiveBgTimer);
+        responsiveBgTimer = window.setTimeout(applyResponsiveCarouselBackgrounds, 100);
+    }
     
     carousels.forEach(carousel => {
         const images = carousel.querySelectorAll('.carousel-image');
@@ -73,4 +94,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Initialiser avec la première image
         showImage(0);
     });
+
+    // Appliquer au chargement + sur changements de taille
+    applyResponsiveCarouselBackgrounds();
+    window.addEventListener('resize', scheduleResponsiveCarouselBackgrounds);
+    window.addEventListener('orientationchange', scheduleResponsiveCarouselBackgrounds);
 });
