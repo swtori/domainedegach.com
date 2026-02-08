@@ -74,23 +74,18 @@ function sendBothEmails(templateParams, onSuccess, onError) {
         return;
     }
 
-    // Préparer les paramètres pour l'email à l'utilisateur
-    const userEmailParams = { ...templateParams };
-    
-    // Préparer les paramètres pour l'email au domaine
-    const domainEmailParams = {
-        ...templateParams,
-        to_email: DOMAIN_EMAIL,
-        to_surname: 'Domaine de Gach',
-        to_lastname: ''
-    };
+    // Email 1 : au client — {{destinataire}} = client, {{to_email}} = client
+    const paramsClient = { ...templateParams, destinataire: templateParams.to_email };
 
-    // Envoyer d'abord l'email à l'utilisateur
-    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, userEmailParams)
+    // Email 2 : aux hôtes — {{destinataire}} = contact@domainedegach.com, {{to_email}} = client (inchangé)
+    const paramsDomaine = { ...templateParams, destinataire: DOMAIN_EMAIL };
+
+    // Envoyer d'abord l'email au client
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, paramsClient)
         .then(function(userResponse) {
-            console.log('Email utilisateur envoyé:', userResponse);
-            // Puis envoyer l'email au domaine
-            return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, domainEmailParams);
+            console.log('Email client envoyé:', userResponse);
+            // Puis envoyer l'email aux hôtes
+            return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, paramsDomaine);
         })
         .then(function(domainResponse) {
             console.log('Email domaine envoyé:', domainResponse);
