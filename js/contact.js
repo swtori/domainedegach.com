@@ -24,7 +24,9 @@ function prepareTemplateParams(formData) {
     return {
         to_surname: formData.surname || formData.name || 'Visiteur',
         to_lastname: formData.name || '',
-        to_email: formData.email,
+        to_email: 'antoinesarrail@gmail.com', // Adresse de destination
+        from_email: formData.email, // Email de l'expéditeur (client)
+        from_name: formData.fullName,
         phone: formData.phone || 'Non renseigné',
         subject: formData.subject || 'Message depuis le site',
         message: formData.message
