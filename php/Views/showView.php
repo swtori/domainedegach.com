@@ -30,9 +30,9 @@
                 <?php foreach ($chambres as $c): ?>
                     <tr>
                         <td><?php echo (int) $c['id']; ?></td>
-                        <td><?php echo htmlspecialchars($c['designation'] ?? '', ENT_QUOTES, 'UTF-8'); ?></td>
-                        <td><?php echo number_format((float) ($c['prix'] ?? 0), 2, ',', ' '); ?> €</td>
-                        <td><?php echo (int) ($c['capaciteMax'] ?? 0); ?></td>
+                        <td><?php echo htmlspecialchars(isset($c['designation']) ? $c['designation'] : '', ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?php echo number_format((float) (isset($c['prix']) ? $c['prix'] : 0), 2, ',', ' '); ?> €</td>
+                        <td><?php echo (int) (isset($c['capaciteMax']) ? $c['capaciteMax'] : 0); ?></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -57,10 +57,10 @@
                 <?php foreach ($clients as $c): ?>
                     <tr>
                         <td><?php echo (int) $c['id']; ?></td>
-                        <td><?php echo htmlspecialchars($c['username'] ?? '', ENT_QUOTES, 'UTF-8'); ?></td>
-                        <td><?php echo htmlspecialchars($c['lastname'] ?? '', ENT_QUOTES, 'UTF-8'); ?></td>
-                        <td><?php echo htmlspecialchars($c['tel'] ?? '', ENT_QUOTES, 'UTF-8'); ?></td>
-                        <td><?php echo htmlspecialchars($c['email'] ?? '', ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?php echo htmlspecialchars(isset($c['username']) ? $c['username'] : '', ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?php echo htmlspecialchars(isset($c['lastname']) ? $c['lastname'] : '', ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?php echo htmlspecialchars(isset($c['tel']) ? $c['tel'] : '', ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?php echo htmlspecialchars(isset($c['email']) ? $c['email'] : '', ENT_QUOTES, 'UTF-8'); ?></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -85,8 +85,8 @@
                 <?php foreach ($reservations as $r): ?>
                     <tr>
                         <td><?php echo (int) $r['id']; ?></td>
-                        <td><?php echo htmlspecialchars($r['dateIn'] ?? '', ENT_QUOTES, 'UTF-8'); ?></td>
-                        <td><?php echo htmlspecialchars($r['dateOut'] ?? '', ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?php echo htmlspecialchars(isset($r['dateIn']) ? $r['dateIn'] : '', ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?php echo htmlspecialchars(isset($r['dateOut']) ? $r['dateOut'] : '', ENT_QUOTES, 'UTF-8'); ?></td>
                         <td><?php echo (int) $r['idChambre']; ?></td>
                         <td><?php echo (int) $r['idClient']; ?></td>
                     </tr>

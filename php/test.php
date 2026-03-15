@@ -1,9 +1,9 @@
 <?php
-// Page de test très simple pour vérifier que PHP fonctionne
-
-echo "<h1>PHP fonctionne ✅</h1>";
-echo "<p>Date/heure serveur : " . date('Y-m-d H:i:s') . "</p>";
-
-// Informations détaillées sur la configuration PHP (extensions, version, etc.)
-phpinfo();
-
+/**
+ * Test minimal : vérifie que PHP répond. Supprimer après débogage.
+ */
+header('Content-Type: text/plain; charset=utf-8');
+ini_set('display_errors', '1');
+error_reporting(E_ALL);
+echo "OK - PHP fonctionne\n";
+echo "PHP " . PHP_VERSION . "\n";

@@ -9,16 +9,20 @@
  *
  * @return array<int, array{id: int, username: string, lastname: string, tel: string, email: string}>
  */
-function clientModel_getAll(): array
+function clientModel_getAll()
 {
     $pdo = getPdo();
     if ($pdo !== null) {
-        $stmt = $pdo->query('SELECT id, username, lastname, tel, email FROM CLIENTS ORDER BY id');
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        foreach ($rows as $i => $row) {
-            $rows[$i]['id'] = (int) $row['id'];
+        try {
+            $stmt = $pdo->query('SELECT id, username, lastname, tel, email FROM CLIENTS ORDER BY id');
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($rows as $i => $row) {
+                $rows[$i]['id'] = (int) $row['id'];
+            }
+            return $rows;
+        } catch (PDOException $e) {
+            // BDD indisponible ou tables absentes : on utilise les données de repli
         }
-        return $rows;
     }
 
     return [

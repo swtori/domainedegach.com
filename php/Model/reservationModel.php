@@ -9,18 +9,22 @@
  *
  * @return array<int, array{id: int, dateIn: string, dateOut: string, idChambre: int, idClient: int}>
  */
-function reservationModel_getAll(): array
+function reservationModel_getAll()
 {
     $pdo = getPdo();
     if ($pdo !== null) {
-        $stmt = $pdo->query('SELECT id, dateIn, dateOut, idChambre, idClient FROM RESERVATIONS ORDER BY id');
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        foreach ($rows as $i => $row) {
-            $rows[$i]['id'] = (int) $row['id'];
-            $rows[$i]['idChambre'] = (int) $row['idChambre'];
-            $rows[$i]['idClient'] = (int) $row['idClient'];
+        try {
+            $stmt = $pdo->query('SELECT id, dateIn, dateOut, idChambre, idClient FROM RESERVATIONS ORDER BY id');
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($rows as $i => $row) {
+                $rows[$i]['id'] = (int) $row['id'];
+                $rows[$i]['idChambre'] = (int) $row['idChambre'];
+                $rows[$i]['idClient'] = (int) $row['idClient'];
+            }
+            return $rows;
+        } catch (PDOException $e) {
+            // BDD indisponible ou tables absentes : on utilise les données de repli
         }
-        return $rows;
     }
 
     return [

@@ -18,7 +18,7 @@ define('DB_PASS', '');
  *
  * @return PDO|null
  */
-function getPdo(): ?PDO
+function getPdo()
 {
     static $pdo = null;
 
