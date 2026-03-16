@@ -10,15 +10,22 @@ define('DB_NAME', 'dbs15409847');
 define('DB_USER', 'dbu1225268');
 define('DB_CHARSET', 'utf8mb4');
 
-// Mot de passe : variable d'environnement GACH_DB_PASS ou fichier env.local.php (créer avec <?php $dbPass = '...'; )
+// Mot de passe : fichier env.local.php prioritaire, sinon variable d'environnement GACH_DB_PASS
 $dbPass = '';
-if (getenv('GACH_DB_PASS') !== false) {
+$envLocal = __DIR__ . DIRECTORY_SEPARATOR . 'env.local.php';
+if (file_exists($envLocal)) {
+    include $envLocal;
+    if (isset($dbPass)) {
+        $dbPass = (string) $dbPass;
+    } else {
+        $dbPass = '';
+    }
+}
+if ($dbPass === '' && getenv('GACH_DB_PASS') !== false && getenv('GACH_DB_PASS') !== '') {
     $dbPass = getenv('GACH_DB_PASS');
-} elseif (isset($_ENV['GACH_DB_PASS'])) {
+}
+if ($dbPass === '' && isset($_ENV['GACH_DB_PASS']) && $_ENV['GACH_DB_PASS'] !== '') {
     $dbPass = $_ENV['GACH_DB_PASS'];
-} elseif (file_exists(__DIR__ . '/env.local.php')) {
-    include __DIR__ . '/env.local.php';
-    $dbPass = isset($dbPass) ? $dbPass : '';
 }
 
 $GLOBALS['_pdo_last_error'] = null;
