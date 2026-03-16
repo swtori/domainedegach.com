@@ -5,32 +5,24 @@
  */
 
 /**
- * Retourne toutes les chambres (BDD ou données de repli).
- *
- * @return array<int, array{id: int, designation: string, prix: float, capaciteMax: int}>
+ * Retourne toutes les chambres (BDD uniquement).
  */
 function chambreModel_getAll()
 {
     $pdo = getPdo();
-    if ($pdo !== null) {
-        try {
-            $stmt = $pdo->query('SELECT id, designation, prix, capaciteMax FROM CHAMBRES ORDER BY id');
-            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            foreach ($rows as $i => $row) {
-                $rows[$i]['id'] = (int) $row['id'];
-                $rows[$i]['prix'] = (float) $row['prix'];
-                $rows[$i]['capaciteMax'] = (int) $row['capaciteMax'];
-            }
-            return $rows;
-        } catch (PDOException $e) {
-            // BDD indisponible ou tables absentes : on utilise les données de repli
-        }
+    if ($pdo === null) {
+        return array();
     }
-
-    return [
-        ['id' => 1, 'designation' => 'LA SUITE', 'prix' => 80.00, 'capaciteMax' => 4],
-        ['id' => 2, 'designation' => 'DENIS', 'prix' => 70.00, 'capaciteMax' => 2],
-        ['id' => 3, 'designation' => 'CRÉOLE', 'prix' => 70.00, 'capaciteMax' => 3],
-        ['id' => 4, 'designation' => 'GEO', 'prix' => 70.00, 'capaciteMax' => 3],
-    ];
+    try {
+        $stmt = $pdo->query('SELECT id, designation, prix, capaciteMax FROM CHAMBRES ORDER BY id');
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($rows as $i => $row) {
+            $rows[$i]['id'] = (int) $row['id'];
+            $rows[$i]['prix'] = (float) $row['prix'];
+            $rows[$i]['capaciteMax'] = (int) $row['capaciteMax'];
+        }
+        return $rows;
+    } catch (PDOException $e) {
+        return array();
+    }
 }

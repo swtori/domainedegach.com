@@ -11,6 +11,7 @@
 -- # - CLIENTS : Utilisateurs du site
 -- # - CHAMBRES : Chambres du site
 -- # - RESERVATIONS : Réservations des chambres
+-- # - USERS : Comptes back-office (authentification)
 -- ######################################################
 
 CREATE DATABASE IF NOT EXISTS gachDb;
@@ -41,3 +42,10 @@ CREATE TABLE RESERVATIONS (
     FOREIGN KEY (idChambre) REFERENCES CHAMBRES(id) ON DELETE CASCADE
 );
 
+-- Table USERS : comptes pour la connexion au back-office (créée à l'installation)
+CREATE TABLE IF NOT EXISTS USERS (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);

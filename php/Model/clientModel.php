@@ -5,28 +5,67 @@
  */
 
 /**
- * Retourne tous les clients (BDD ou données de repli).
- *
- * @return array<int, array{id: int, username: string, lastname: string, tel: string, email: string}>
+ * Retourne tous les clients (BDD uniquement).
  */
 function clientModel_getAll()
 {
     $pdo = getPdo();
-    if ($pdo !== null) {
-        try {
-            $stmt = $pdo->query('SELECT id, username, lastname, tel, email FROM CLIENTS ORDER BY id');
-            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            foreach ($rows as $i => $row) {
-                $rows[$i]['id'] = (int) $row['id'];
-            }
-            return $rows;
-        } catch (PDOException $e) {
-            // BDD indisponible ou tables absentes : on utilise les données de repli
-        }
+    if ($pdo === null) {
+        return array();
     }
+    try {
+        $stmt = $pdo->query('SELECT id, username, lastname, tel, email FROM CLIENTS ORDER BY id');
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($rows as $i => $row) {
+            $rows[$i]['id'] = (int) $row['id'];
+        }
+        return $rows;
+    } catch (PDOException $e) {
+        return array();
+    }
+}
 
-    return [
-        ['id' => 1, 'username' => 'dupont', 'lastname' => 'Dupont', 'tel' => '0600000001', 'email' => 'dupont@example.com'],
-        ['id' => 2, 'username' => 'martin', 'lastname' => 'Martin', 'tel' => '0600000002', 'email' => 'martin@example.com'],
-    ];
+/**
+ * Insère un client en BDD. Retourne true en cas de succès, false sinon.
+ */
+function clientModel_insert($username, $lastname, $tel, $email)
+{
+    $pdo = getPdo();
+    if ($pdo === null) {
+        return false;
+    }
+    try {
+        $stmt = $pdo->prepare('INSERT INTO CLIENTS (username, lastname, tel, email) VALUES (?, ?, ?, ?)');
+        $stmt->execute(array(
+            trim($username),
+            trim($lastname),
+            trim($tel),
+            trim($email),
+        ));
+        return true;
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
+/**
+ * Supprime un client par id. Retourne true si une ligne a été supprimée, false sinon.
+ */
+function clientModel_delete($id)
+{
+    $pdo = getPdo();
+    if ($pdo === null) {
+        return false;
+    }
+    $id = (int) $id;
+    if ($id <= 0) {
+        return false;
+    }
+    try {
+        $stmt = $pdo->prepare('DELETE FROM CLIENTS WHERE id = ?');
+        $stmt->execute(array($id));
+        return $stmt->rowCount() > 0;
+    } catch (PDOException $e) {
+        return false;
+    }
 }
