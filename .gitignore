@@ -7,6 +7,7 @@ Thumbs.db
 
 # Fichiers de configuration locaux
 config.local.js
+php/Config/env.local.php
 
 # Images (si volumineuses, utilisez un CDN)
 # images/

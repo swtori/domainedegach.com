@@ -10,8 +10,16 @@ define('DB_NAME', 'dbs15409847');
 define('DB_USER', 'dbu1225268');
 define('DB_CHARSET', 'utf8mb4');
 
-// Mot de passe de la base (obligatoire) : remplace '' par ton mot de passe, ex. define('DB_PASS', 'ton_mot_de_passe');
-define('DB_PASS', 'N2!mTq59!KgsSx65');
+// Mot de passe : variable d'environnement GACH_DB_PASS ou fichier env.local.php (créer avec <?php $dbPass = '...'; )
+$dbPass = '';
+if (getenv('GACH_DB_PASS') !== false) {
+    $dbPass = getenv('GACH_DB_PASS');
+} elseif (isset($_ENV['GACH_DB_PASS'])) {
+    $dbPass = $_ENV['GACH_DB_PASS'];
+} elseif (file_exists(__DIR__ . '/env.local.php')) {
+    include __DIR__ . '/env.local.php';
+    $dbPass = isset($dbPass) ? $dbPass : '';
+}
 
 $GLOBALS['_pdo_last_error'] = null;
 
@@ -41,7 +49,7 @@ function getPdo()
             DB_NAME,
             DB_CHARSET
         );
-        $pdo = new PDO($dsn, DB_USER, DB_PASS, [
+        $pdo = new PDO($dsn, DB_USER, $dbPass, [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         ]);
