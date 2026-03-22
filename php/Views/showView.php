@@ -16,7 +16,7 @@
     <h1>Domaine de Gach</h1>
     <p>Connecté en tant que <strong><?php echo htmlspecialchars(isset($currentUser['username']) ? $currentUser['username'] : '', ENT_QUOTES, 'UTF-8'); ?></strong> — <a href="?action=logout">Déconnexion</a></p>
     <?php if (isset($dbConnected) && !$dbConnected): ?>
-        <p style="background:#fcc; padding:0.5em;"><strong>Base de données non connectée.</strong> Vérifier <code>Config/database.php</code> (mot de passe dans <code>DB_PASS</code>, nom de la base <code>dbs15409847</code>, tables <code>CLIENTS</code> / <code>CHAMBRES</code> / <code>RESERVATIONS</code> en majuscules).<?php if (function_exists('getPdoError') && getPdoError() !== null): ?> <br>Erreur MySQL/PDO : <code><?php echo htmlspecialchars(getPdoError(), ENT_QUOTES, 'UTF-8'); ?></code><?php endif; ?></p>
+        <p style="background:#f5f5f5; padding:1rem;">Service temporairement indisponible. Réessayez plus tard.</p>
     <?php endif; ?>
 
     <h2>Chambres</h2>
@@ -50,13 +50,13 @@
         <p style="color:green;">Client ajouté.</p>
     <?php endif; ?>
     <?php if (isset($_GET['error_add']) && $_GET['error_add'] === '1'): ?>
-        <p style="color:red;">Erreur lors de l'ajout (connexion BDD ou email déjà utilisé).</p>
+        <p style="color:red;">L'opération n'a pas abouti. Réessayez.</p>
     <?php endif; ?>
     <?php if (isset($_GET['deleted']) && $_GET['deleted'] === '1'): ?>
         <p style="color:green;">Client supprimé.</p>
     <?php endif; ?>
     <?php if (isset($_GET['error_delete']) && $_GET['error_delete'] === '1'): ?>
-        <p style="color:red;">Erreur lors de la suppression.</p>
+        <p style="color:red;">L'opération n'a pas abouti. Réessayez.</p>
     <?php endif; ?>
     <form method="post" action="">
         <input type="hidden" name="action" value="add_client">
