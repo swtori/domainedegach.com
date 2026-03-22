@@ -69,3 +69,82 @@ function clientModel_delete($id)
         return false;
     }
 }
+
+/**
+ * Retourne un client par id ou null.
+ */
+function clientModel_getById($id)
+{
+    $pdo = getPdo();
+    if ($pdo === null) {
+        return null;
+    }
+    $id = (int) $id;
+    if ($id <= 0) {
+        return null;
+    }
+    try {
+        $stmt = $pdo->prepare('SELECT id, username, lastname, tel, email FROM CLIENTS WHERE id = ? LIMIT 1');
+        $stmt->execute(array($id));
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$row) {
+            return null;
+        }
+        $row['id'] = (int) $row['id'];
+        return $row;
+    } catch (PDOException $e) {
+        return null;
+    }
+}
+
+/**
+ * True si un autre client (id différent) utilise déjà cet email.
+ */
+function clientModel_emailTakenByOther($email, $excludeId)
+{
+    $pdo = getPdo();
+    if ($pdo === null) {
+        return true;
+    }
+    $excludeId = (int) $excludeId;
+    try {
+        $stmt = $pdo->prepare('SELECT COUNT(*) FROM CLIENTS WHERE email = ? AND id <> ?');
+        $stmt->execute(array(trim($email), $excludeId));
+        return (int) $stmt->fetchColumn() > 0;
+    } catch (PDOException $e) {
+        return true;
+    }
+}
+
+/**
+ * Met à jour un client. Retourne true si une ligne a été modifiée.
+ */
+function clientModel_update($id, $username, $lastname, $tel, $email)
+{
+    $pdo = getPdo();
+    if ($pdo === null) {
+        return false;
+    }
+    $id = (int) $id;
+    if ($id <= 0) {
+        return false;
+    }
+    try {
+        $stmt = $pdo->prepare('UPDATE CLIENTS SET username = ?, lastname = ?, tel = ?, email = ? WHERE id = ?');
+        $stmt->execute(array(
+            trim($username),
+            trim($lastname),
+            trim($tel),
+            trim($email),
+            $id,
+        ));
+        if ($stmt->rowCount() > 0) {
+            return true;
+        }
+        $chk = $pdo->prepare('SELECT id FROM CLIENTS WHERE id = ? LIMIT 1');
+        $chk->execute(array($id));
+        return (bool) $chk->fetchColumn();
+    } catch (PDOException $e) {
+        return false;
+    }
+}
