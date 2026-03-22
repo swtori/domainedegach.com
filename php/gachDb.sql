@@ -49,3 +49,31 @@ CREATE TABLE IF NOT EXISTS USERS (
     password_hash VARCHAR(255) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+-- ######################################################
+-- # Jeux d'essais (données de démonstration)
+-- # Réimport : exécuter d’abord les DELETE ci-dessous (ordre FK),
+-- # puis les INSERT, ou repartir d’une base vide avec ce script entier.
+-- ######################################################
+
+INSERT INTO CHAMBRES (designation, prix, capaciteMax) VALUES
+    ('Suite', 125.00, 4),
+    ('Chambre Denis', 89.00, 2),
+    ('Chambre Créole', 95.00, 2),
+    ('Chambre Géo', 85.00, 2);
+
+INSERT INTO CLIENTS (username, lastname, tel, email) VALUES
+    ('Marie', 'Durand', '0612345678', 'marie.durand@example.com'),
+    ('Jean', 'Bernard', '0623456789', 'jean.bernard@example.com'),
+    ('Sophie', 'Martin', '0634567890', 'sophie.martin@example.com'),
+    ('Luc', 'Petit', '0645678901', 'luc.petit@example.com'),
+    ('Camille', 'Roux', '0656789012', 'camille.roux@example.com');
+
+-- idChambre / idClient : sous-requêtes sur désignation et email (uniques)
+INSERT INTO RESERVATIONS (dateIn, dateOut, idChambre, idClient) VALUES
+    ('2025-06-10', '2025-06-14', (SELECT id FROM CHAMBRES WHERE designation = 'Suite' LIMIT 1), (SELECT id FROM CLIENTS WHERE email = 'marie.durand@example.com' LIMIT 1)),
+    ('2025-07-01', '2025-07-05', (SELECT id FROM CHAMBRES WHERE designation = 'Chambre Denis' LIMIT 1), (SELECT id FROM CLIENTS WHERE email = 'jean.bernard@example.com' LIMIT 1)),
+    ('2025-07-20', '2025-07-22', (SELECT id FROM CHAMBRES WHERE designation = 'Chambre Créole' LIMIT 1), (SELECT id FROM CLIENTS WHERE email = 'marie.durand@example.com' LIMIT 1)),
+    ('2025-08-15', '2025-08-21', (SELECT id FROM CHAMBRES WHERE designation = 'Chambre Géo' LIMIT 1), (SELECT id FROM CLIENTS WHERE email = 'sophie.martin@example.com' LIMIT 1)),
+    ('2026-04-05', '2026-04-08', (SELECT id FROM CHAMBRES WHERE designation = 'Chambre Denis' LIMIT 1), (SELECT id FROM CLIENTS WHERE email = 'luc.petit@example.com' LIMIT 1)),
+    ('2026-05-12', '2026-05-18', (SELECT id FROM CHAMBRES WHERE designation = 'Suite' LIMIT 1), (SELECT id FROM CLIENTS WHERE email = 'camille.roux@example.com' LIMIT 1));
