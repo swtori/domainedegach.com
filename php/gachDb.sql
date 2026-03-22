@@ -70,10 +70,40 @@ INSERT INTO CLIENTS (username, lastname, tel, email) VALUES
     ('Camille', 'Roux', '0656789012', 'camille.roux@example.com');
 
 -- idChambre / idClient : sous-requêtes sur désignation et email (uniques)
+-- Insertion des réservations de démonstration, réparties par chambres et clients pour une meilleure lisibilité
 INSERT INTO RESERVATIONS (dateIn, dateOut, idChambre, idClient) VALUES
-    ('2025-06-10', '2025-06-14', (SELECT id FROM CHAMBRES WHERE designation = 'Suite' LIMIT 1), (SELECT id FROM CLIENTS WHERE email = 'marie.durand@example.com' LIMIT 1)),
-    ('2025-07-01', '2025-07-05', (SELECT id FROM CHAMBRES WHERE designation = 'Chambre Denis' LIMIT 1), (SELECT id FROM CLIENTS WHERE email = 'jean.bernard@example.com' LIMIT 1)),
-    ('2025-07-20', '2025-07-22', (SELECT id FROM CHAMBRES WHERE designation = 'Chambre Créole' LIMIT 1), (SELECT id FROM CLIENTS WHERE email = 'marie.durand@example.com' LIMIT 1)),
-    ('2025-08-15', '2025-08-21', (SELECT id FROM CHAMBRES WHERE designation = 'Chambre Géo' LIMIT 1), (SELECT id FROM CLIENTS WHERE email = 'sophie.martin@example.com' LIMIT 1)),
-    ('2026-04-05', '2026-04-08', (SELECT id FROM CHAMBRES WHERE designation = 'Chambre Denis' LIMIT 1), (SELECT id FROM CLIENTS WHERE email = 'luc.petit@example.com' LIMIT 1)),
-    ('2026-05-12', '2026-05-18', (SELECT id FROM CHAMBRES WHERE designation = 'Suite' LIMIT 1), (SELECT id FROM CLIENTS WHERE email = 'camille.roux@example.com' LIMIT 1));
+    -- Réservation de la Suite par Marie Durand
+    ('2025-06-10', '2025-06-14',
+        (SELECT id FROM CHAMBRES WHERE designation = 'Suite' LIMIT 1),
+        (SELECT id FROM CLIENTS WHERE email = 'marie.durand@example.com' LIMIT 1)
+    ),
+
+    -- Chambre Denis réservée par Jean Bernard
+    ('2025-07-01', '2025-07-05',
+        (SELECT id FROM CHAMBRES WHERE designation = 'Chambre Denis' LIMIT 1),
+        (SELECT id FROM CLIENTS WHERE email = 'jean.bernard@example.com' LIMIT 1)
+    ),
+
+    -- Chambre Créole réservée à nouveau par Marie Durand
+    ('2025-07-20', '2025-07-22',
+        (SELECT id FROM CHAMBRES WHERE designation = 'Chambre Créole' LIMIT 1),
+        (SELECT id FROM CLIENTS WHERE email = 'marie.durand@example.com' LIMIT 1)
+    ),
+
+    -- Chambre Géo réservée par Sophie Martin
+    ('2025-08-15', '2025-08-21',
+        (SELECT id FROM CHAMBRES WHERE designation = 'Chambre Géo' LIMIT 1),
+        (SELECT id FROM CLIENTS WHERE email = 'sophie.martin@example.com' LIMIT 1)
+    ),
+
+    -- Chambre Denis par Luc Petit
+    ('2026-04-05', '2026-04-08',
+        (SELECT id FROM CHAMBRES WHERE designation = 'Chambre Denis' LIMIT 1),
+        (SELECT id FROM CLIENTS WHERE email = 'luc.petit@example.com' LIMIT 1)
+    ),
+
+    -- Suite réservée par Camille Roux
+    ('2026-05-12', '2026-05-18',
+        (SELECT id FROM CHAMBRES WHERE designation = 'Suite' LIMIT 1),
+        (SELECT id FROM CLIENTS WHERE email = 'camille.roux@example.com' LIMIT 1)
+    );
