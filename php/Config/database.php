@@ -13,7 +13,11 @@ define('DB_CHARSET', 'utf8mb4');
 // Mot de passe : fichier env.local.php prioritaire, sinon variable d'environnement GACH_DB_PASS
 $dbPass = '';
 $envLocal = __DIR__ . DIRECTORY_SEPARATOR . 'env.local.php';
+if (!file_exists($envLocal)) {
+    $envLocal = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'env.local.php';
+}
 if (file_exists($envLocal)) {
+    define('GACH_ENV_LOADED', true);
     include $envLocal;
     if (isset($dbPass)) {
         $dbPass = (string) $dbPass;
@@ -28,16 +32,9 @@ if ($dbPass === '' && isset($_ENV['GACH_DB_PASS']) && $_ENV['GACH_DB_PASS'] !== 
     $dbPass = $_ENV['GACH_DB_PASS'];
 }
 
-$GLOBALS['_pdo_last_error'] = null;
-
-/** Retourne l'erreur de la dernière tentative de connexion PDO, ou null. */
-function getPdoError()
-{
-    return isset($GLOBALS['_pdo_last_error']) ? $GLOBALS['_pdo_last_error'] : null;
-}
-
 /**
  * Retourne une instance PDO ou null si la connexion échoue.
+ * Aucune erreur système n'est exposée (prod).
  */
 function getPdo()
 {
@@ -47,7 +44,7 @@ function getPdo()
         return $pdo;
     }
 
-    $GLOBALS['_pdo_last_error'] = null;
+    global $dbPass;
     try {
         $dsn = sprintf(
             'mysql:host=%s;port=%s;dbname=%s;charset=%s',
@@ -56,12 +53,11 @@ function getPdo()
             DB_NAME,
             DB_CHARSET
         );
-        $pdo = new PDO($dsn, DB_USER, $dbPass, [
+        $pdo = new PDO($dsn, DB_USER, isset($dbPass) ? $dbPass : '', [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         ]);
     } catch (PDOException $e) {
-        $GLOBALS['_pdo_last_error'] = $e->getMessage();
         $pdo = null;
     }
 
