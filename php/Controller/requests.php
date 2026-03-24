@@ -215,9 +215,6 @@ $chambres = chambreModel_getAll();
 $clients = clientModel_getAll();
 $reservations = reservationModel_getAll();
 
-<<<<<<< HEAD
 // Choix de la vue à afficher (pour l’instant une seule)
 require __DIR__ . '/../Views/showView.php';
-=======
-require __DIR__ . '/../Views/showView.php';
->>>>>>> 87a7a0014e3a57c8639f49e7b9f554f7b8dc1fe5
+
