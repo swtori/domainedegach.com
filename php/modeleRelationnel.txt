@@ -1,0 +1,4 @@
+CLIENTS(id PK,username,lastname,tel,email UNIQUE)
+CHAMBRES(id PK,designation,prix,capaciteMax)
+RESERVATIONS(id PK,dateIn,dateOut,idChambre,idClient)
+USERS(id PK,username UNIQUE,password_hash,created_at)
