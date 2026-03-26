@@ -10,11 +10,12 @@ require_once __DIR__ . '/../Model/chambreModel.php';
 require_once __DIR__ . '/../Model/clientModel.php';
 require_once __DIR__ . '/../Model/reservationModel.php';
 require_once __DIR__ . '/../Model/userModel.php';
+require_once __DIR__ . '/controllerHelpers.php';
+require_once __DIR__ . '/chambreRequests.php';
+require_once __DIR__ . '/clientRequests.php';
+require_once __DIR__ . '/reservationRequests.php';
 
-$baseUrl = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-if ($baseUrl === null || $baseUrl === '') {
-    $baseUrl = '/php/index.php';
-}
+$baseUrl = controller_getBaseUrl();
 
 // Déconnexion
 if (isset($_GET['action']) && $_GET['action'] === 'logout') {
@@ -24,22 +25,20 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
         setcookie(session_name(), '', time() - 3600, $p['path'], $p['domain'], $p['secure'], $p['httponly']);
     }
     session_destroy();
-    header('Location: ' . $baseUrl);
-    exit;
+    controller_redirect($baseUrl);
 }
 
 // Connexion (POST login)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'login') {
-    $username = isset($_POST['username']) ? trim($_POST['username']) : '';
-    $password = isset($_POST['password']) ? (string) $_POST['password'] : '';
+    $username = trim(controller_postString('username'));
+    $password = controller_postString('password');
     if (validation_isNonEmptyString($username, 255) && $password !== '' && strlen($password) <= 4096) {
         $user = userModel_verifyLogin($username, $password);
         if ($user !== null) {
             session_regenerate_id(true);
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
-            header('Location: ' . $baseUrl);
-            exit;
+            controller_redirect($baseUrl);
         }
     }
     $loginError = 'Identifiant ou mot de passe incorrect.';
@@ -57,137 +56,11 @@ if (!$loggedIn) {
 
 // Traitement des actions (POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    $action = $_POST['action'];
+    $action = (string) $_POST['action'];
 
-    if ($action === 'add_client') {
-        $username = isset($_POST['username']) ? $_POST['username'] : '';
-        $lastname = isset($_POST['lastname']) ? $_POST['lastname'] : '';
-        $tel = isset($_POST['tel']) ? $_POST['tel'] : '';
-        $email = isset($_POST['email']) ? $_POST['email'] : '';
-        $errs = validation_clientPayload($username, $lastname, $tel, $email);
-        if (!empty($errs)) {
-            header('Location: ' . $baseUrl . '?error=client_validation');
-            exit;
-        }
-        if (clientModel_emailTakenByOther($email, 0)) {
-            header('Location: ' . $baseUrl . '?error=client_email_dup');
-            exit;
-        }
-        $ok = clientModel_insert($username, $lastname, $tel, $email);
-        header('Location: ' . $baseUrl . ($ok ? '?success=client_add' : '?error=client_db'));
-        exit;
-    }
-
-    if ($action === 'update_client') {
-        $id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
-        $username = isset($_POST['username']) ? $_POST['username'] : '';
-        $lastname = isset($_POST['lastname']) ? $_POST['lastname'] : '';
-        $tel = isset($_POST['tel']) ? $_POST['tel'] : '';
-        $email = isset($_POST['email']) ? $_POST['email'] : '';
-        if (!validation_positiveInt($id)) {
-            header('Location: ' . $baseUrl . '?error=client_validation');
-            exit;
-        }
-        $errs = validation_clientPayload($username, $lastname, $tel, $email);
-        if (!empty($errs)) {
-            header('Location: ' . $baseUrl . '?error=client_validation&edit_client=' . $id);
-            exit;
-        }
-        if (clientModel_emailTakenByOther($email, $id)) {
-            header('Location: ' . $baseUrl . '?error=client_email_dup&edit_client=' . $id);
-            exit;
-        }
-        if (clientModel_getById($id) === null) {
-            header('Location: ' . $baseUrl . '?error=client_db');
-            exit;
-        }
-        $ok = clientModel_update($id, $username, $lastname, $tel, $email);
-        header('Location: ' . $baseUrl . ($ok ? '?success=client_update' : '?error=client_db'));
-        exit;
-    }
-
-    if ($action === 'delete_client' && isset($_POST['id'])) {
-        $id = (int) $_POST['id'];
-        if (!validation_positiveInt($id)) {
-            header('Location: ' . $baseUrl . '?error=client_validation');
-            exit;
-        }
-        $ok = clientModel_delete($id);
-        header('Location: ' . $baseUrl . ($ok ? '?success=client_delete' : '?error=client_db'));
-        exit;
-    }
-
-    if ($action === 'add_reservation') {
-        $dateIn = isset($_POST['date_in']) ? trim((string) $_POST['date_in']) : '';
-        $dateOut = isset($_POST['date_out']) ? trim((string) $_POST['date_out']) : '';
-        $idChambre = isset($_POST['id_chambre']) ? (int) $_POST['id_chambre'] : 0;
-        $idClient = isset($_POST['id_client']) ? (int) $_POST['id_client'] : 0;
-        if (!validation_reservationDateRange($dateIn, $dateOut)) {
-            header('Location: ' . $baseUrl . '?error=reservation_validation');
-            exit;
-        }
-        if (!validation_positiveInt($idChambre) || !validation_positiveInt($idClient)) {
-            header('Location: ' . $baseUrl . '?error=reservation_validation');
-            exit;
-        }
-        if (!reservationModel_foreignKeysExist($idChambre, $idClient)) {
-            header('Location: ' . $baseUrl . '?error=reservation_validation');
-            exit;
-        }
-        if (reservationModel_hasOverlap($idChambre, $dateIn, $dateOut, null)) {
-            header('Location: ' . $baseUrl . '?error=reservation_overlap');
-            exit;
-        }
-        $ok = reservationModel_insert($dateIn, $dateOut, $idChambre, $idClient);
-        header('Location: ' . $baseUrl . ($ok ? '?success=reservation_add' : '?error=reservation_db'));
-        exit;
-    }
-
-    if ($action === 'update_reservation') {
-        $id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
-        $dateIn = isset($_POST['date_in']) ? trim((string) $_POST['date_in']) : '';
-        $dateOut = isset($_POST['date_out']) ? trim((string) $_POST['date_out']) : '';
-        $idChambre = isset($_POST['id_chambre']) ? (int) $_POST['id_chambre'] : 0;
-        $idClient = isset($_POST['id_client']) ? (int) $_POST['id_client'] : 0;
-        if (!validation_positiveInt($id)) {
-            header('Location: ' . $baseUrl . '?error=reservation_validation');
-            exit;
-        }
-        if (!validation_reservationDateRange($dateIn, $dateOut)) {
-            header('Location: ' . $baseUrl . '?error=reservation_validation&edit_reservation=' . $id);
-            exit;
-        }
-        if (!validation_positiveInt($idChambre) || !validation_positiveInt($idClient)) {
-            header('Location: ' . $baseUrl . '?error=reservation_validation&edit_reservation=' . $id);
-            exit;
-        }
-        if (reservationModel_getById($id) === null) {
-            header('Location: ' . $baseUrl . '?error=reservation_db');
-            exit;
-        }
-        if (!reservationModel_foreignKeysExist($idChambre, $idClient)) {
-            header('Location: ' . $baseUrl . '?error=reservation_validation&edit_reservation=' . $id);
-            exit;
-        }
-        if (reservationModel_hasOverlap($idChambre, $dateIn, $dateOut, $id)) {
-            header('Location: ' . $baseUrl . '?error=reservation_overlap&edit_reservation=' . $id);
-            exit;
-        }
-        $ok = reservationModel_update($id, $dateIn, $dateOut, $idChambre, $idClient);
-        header('Location: ' . $baseUrl . ($ok ? '?success=reservation_update' : '?error=reservation_db'));
-        exit;
-    }
-
-    if ($action === 'delete_reservation' && isset($_POST['id'])) {
-        $id = (int) $_POST['id'];
-        if (!validation_positiveInt($id)) {
-            header('Location: ' . $baseUrl . '?error=reservation_validation');
-            exit;
-        }
-        $ok = reservationModel_delete($id);
-        header('Location: ' . $baseUrl . ($ok ? '?success=reservation_delete' : '?error=reservation_db'));
-        exit;
-    }
+    // Dispatch par domaine : clients puis réservations.
+    controller_handleClientAction($action, $baseUrl);
+    controller_handleReservationAction($action, $baseUrl);
 }
 
 $dbConnected = (getPdo() !== null);
@@ -211,7 +84,7 @@ if (isset($_GET['edit_reservation'])) {
 }
 
 // Récupération des données via les Models
-$chambres = chambreModel_getAll();
+$chambres = controller_getChambres();
 $clients = clientModel_getAll();
 $reservations = reservationModel_getAll();
 
