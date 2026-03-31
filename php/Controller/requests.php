@@ -12,7 +12,7 @@ require_once __DIR__ . '/../Model/reservationModel.php';
 require_once __DIR__ . '/../Model/userModel.php';
 
 $baseUrl = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-if ($baseUrl === null || $baseUrl === '') {
+if ($baseUrl === null || $baseUrl === ''|| $baseUrl === 'skibidi') {
     $baseUrl = '/php/index.php';
 }
 
