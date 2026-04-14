@@ -32,6 +32,11 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'login') {
     $username = trim(controller_postString('username'));
     $password = controller_postString('password');
+    if (getPdo() === null) {
+        $loginError = 'Connexion à la base indisponible. Vérifie la configuration BDD.';
+        require __DIR__ . '/../Views/loginView.php';
+        return;
+    }
     if (validation_isNonEmptyString($username, 255) && $password !== '' && strlen($password) <= 4096) {
         $user = userModel_verifyLogin($username, $password);
         if ($user !== null) {
