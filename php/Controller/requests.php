@@ -60,6 +60,30 @@ if (!$loggedIn) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $action = $_POST['action'];
 
+    if ($action === 'add_user') {
+        $username = isset($_POST['username']) ? $_POST['username'] : '';
+        $password = isset($_POST['password']) ? (string) $_POST['password'] : '';
+        $passwordConfirm = isset($_POST['password_confirm']) ? (string) $_POST['password_confirm'] : '';
+
+        $errs = validation_userPayload($username, $password, $passwordConfirm);
+        if (!empty($errs)) {
+            $errorCode = in_array('username', $errs, true) ? 'user_validation' : 'user_password';
+            if (in_array('password_confirm', $errs, true)) {
+                $errorCode = 'user_password_confirm';
+            }
+            header('Location: ' . $baseUrl . '?error=' . $errorCode);
+            exit;
+        }
+        if (userModel_usernameExists($username)) {
+            header('Location: ' . $baseUrl . '?error=user_username_dup');
+            exit;
+        }
+
+        $ok = userModel_create($username, $password);
+        header('Location: ' . $baseUrl . ($ok ? '?success=user_add' : '?error=user_db'));
+        exit;
+    }
+
     if ($action === 'add_client') {
         $username = isset($_POST['username']) ? $_POST['username'] : '';
         $lastname = isset($_POST['lastname']) ? $_POST['lastname'] : '';
@@ -213,6 +237,7 @@ if (isset($_GET['edit_reservation'])) {
 
 // Récupération des données via les Models
 $chambres = chambreModel_getAll();
+$users = userModel_getAll();
 $clients = clientModel_getAll();
 $reservations = reservationModel_getAll();
 

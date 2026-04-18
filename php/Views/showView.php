@@ -1,5 +1,6 @@
 <?php
 /** @var array $chambres */
+/** @var array $users */
 /** @var array $clients */
 /** @var array $reservations */
 /** @var bool $dbConnected */
@@ -218,6 +219,67 @@ $flashError = isset($_GET['error']) ? (string) $_GET['error'] : '';
                                 <td><?php echo htmlspecialchars(isset($c['designation']) ? $c['designation'] : '', ENT_QUOTES, 'UTF-8'); ?></td>
                                 <td><?php echo number_format((float) (isset($c['prix']) ? $c['prix'] : 0), 2, ',', ' '); ?> €</td>
                                 <td><?php echo (int) (isset($c['capaciteMax']) ? $c['capaciteMax'] : 0); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+    </section>
+
+    <section class="card">
+        <h2>Utilisateurs back-office</h2>
+        <?php
+        if ($flashSuccess === 'user_add') {
+            echo '<p class="flash flash--ok">Utilisateur créé.</p>';
+        }
+        if ($flashError === 'user_validation') {
+            echo '<p class="flash flash--err">Identifiant invalide.</p>';
+        }
+        if ($flashError === 'user_password') {
+            echo '<p class="flash flash--err">Le mot de passe doit contenir au moins 8 caractères.</p>';
+        }
+        if ($flashError === 'user_password_confirm') {
+            echo '<p class="flash flash--err">La confirmation du mot de passe ne correspond pas.</p>';
+        }
+        if ($flashError === 'user_username_dup') {
+            echo '<p class="flash flash--err">Cet identifiant est déjà utilisé.</p>';
+        }
+        if ($flashError === 'user_db') {
+            echo '<p class="flash flash--err">Impossible de créer l\'utilisateur pour le moment.</p>';
+        }
+        ?>
+
+        <h3>Nouvel utilisateur</h3>
+        <form method="post" action="" class="form-grid">
+            <input type="hidden" name="action" value="add_user">
+            <label>Identifiant <input type="text" name="username" required maxlength="255" autocomplete="off"></label>
+            <label>Mot de passe <input type="password" name="password" required minlength="8" maxlength="4096" autocomplete="new-password"></label>
+            <label>Confirmer le mot de passe <input type="password" name="password_confirm" required minlength="8" maxlength="4096" autocomplete="new-password"></label>
+            <div class="btn-row">
+                <button type="submit">Créer l'utilisateur</button>
+            </div>
+        </form>
+        <p class="hint">Tous les utilisateurs connectés ont actuellement accès à cette création de compte.</p>
+
+        <?php if (empty($users)): ?>
+            <p class="empty">Aucun utilisateur.</p>
+        <?php else: ?>
+            <div class="data-table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Identifiant</th>
+                            <th>Créé le</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($users as $u): ?>
+                            <tr>
+                                <td><?php echo (int) $u['id']; ?></td>
+                                <td><?php echo htmlspecialchars(isset($u['username']) ? $u['username'] : '', ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars(isset($u['created_at']) ? $u['created_at'] : '', ENT_QUOTES, 'UTF-8'); ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
