@@ -20,8 +20,7 @@ if ($baseUrl === null || $baseUrl === ''|| $baseUrl === 'skibidi') {
 if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     $_SESSION = array();
     if (ini_get('session.use_cookies')) {
-        $p = session_get_cooki
-        e_params();
+        $p = session_get_cookie_params();
         setcookie(session_name(), '', time() - 3600, $p['path'], $p['domain'], $p['secure'], $p['httponly']);
     }
     session_destroy();
