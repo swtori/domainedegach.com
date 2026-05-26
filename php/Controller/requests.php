@@ -12,7 +12,7 @@ require_once __DIR__ . '/../Model/reservationModel.php';
 require_once __DIR__ . '/../Model/userModel.php';
 
 $baseUrl = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-if ($baseUrl === null || $baseUrl === ''|| $baseUrl === 'skibidi') {
+if ($baseUrl === null || $baseUrl === '') {
     $baseUrl = '/php/index.php';
 }
 
@@ -30,18 +30,13 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
 
 // Connexion (POST login)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'login') {
-<<<<<<< HEAD
-    $username = trim(controller_postString('username'));
-    $password = controller_postString('password');
+    $username = isset($_POST['username']) ? trim($_POST['username']) : '';
+    $password = isset($_POST['password']) ? (string) $_POST['password'] : '';
     if (getPdo() === null) {
         $loginError = 'Connexion à la base indisponible. Vérifie la configuration BDD.';
         require __DIR__ . '/../Views/loginView.php';
         return;
     }
-=======
-    $username = isset($_POST['username']) ? trim($_POST['username']) : '';
-    $password = isset($_POST['password']) ? (string) $_POST['password'] : '';
->>>>>>> 9d835ea152a75fbbbb6a446c0a9698db885915b3
     if (validation_isNonEmptyString($username, 255) && $password !== '' && strlen($password) <= 4096) {
         $user = userModel_verifyLogin($username, $password);
         if ($user !== null) {
