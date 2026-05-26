@@ -25,7 +25,8 @@ function prepareTemplateParams(formData) {
     return {
         to_surname: formData.surname || formData.name || 'Visiteur',
         to_lastname: formData.name || '',
-        to_email: 'antoinesarrail@gmail.com', // Adresse de destination
+        // Email du client saisi dans le formulaire (copie de confirmation)
+        to_email: formData.email,
         from_email: formData.email, // Email de l'expéditeur (client)
         from_name: formData.fullName,
         phone: formData.phone || 'Non renseigné',
@@ -76,10 +77,11 @@ function sendBothEmails(templateParams, onSuccess, onError) {
         return;
     }
 
-    // Email 1 : au client — {{destinataire}} = client, {{to_email}} = client
+    // Email 1 : au client — {{to_email}} et {{destinataire}} = email client
     const paramsClient = { ...templateParams, destinataire: templateParams.to_email };
 
-    // Email 2 : aux hôtes — {{destinataire}} = contact@domainedegach.com, {{to_email}} = client (inchangé)
+    // Email 2 : aux hôtes — destinataire = contact@domainedegach.com
+    // to_email reste l'email utilisateur demandé
     const paramsDomaine = { ...templateParams, destinataire: DOMAIN_EMAIL };
 
     // Envoyer d'abord l'email au client

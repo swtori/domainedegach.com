@@ -24,6 +24,36 @@ function userModel_getByUsername($username)
 }
 
 /**
+ * Retourne tous les utilisateurs back-office.
+ */
+function userModel_getAll()
+{
+    $pdo = getPdo();
+    if ($pdo === null) {
+        return array();
+    }
+    try {
+        $stmt = $pdo->query('SELECT id, username, created_at FROM USERS ORDER BY username ASC');
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($rows as $i => $row) {
+            $rows[$i]['id'] = (int) $row['id'];
+            $rows[$i]['created_at'] = isset($row['created_at']) ? (string) $row['created_at'] : '';
+        }
+        return $rows;
+    } catch (PDOException $e) {
+        return array();
+    }
+}
+
+/**
+ * True si le login est déjà utilisé.
+ */
+function userModel_usernameExists($username)
+{
+    return userModel_getByUsername($username) !== null;
+}
+
+/**
  * Vérifie identifiant + mot de passe. Retourne les infos utilisateur si OK, null sinon.
  */
 function userModel_verifyLogin($username, $password)

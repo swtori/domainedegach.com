@@ -107,6 +107,25 @@ function validation_clientPayload($username, $lastname, $tel, $email)
 }
 
 /**
+ * Valide les champs utilisateur pour création back-office.
+ * @return array<string> liste vide si OK, sinon codes d'erreur
+ */
+function validation_userPayload($username, $password, $passwordConfirm)
+{
+    $err = array();
+    if (!validation_isNonEmptyString($username, 255)) {
+        $err[] = 'username';
+    }
+    if (!is_string($password) || strlen($password) < 8 || strlen($password) > 4096) {
+        $err[] = 'password';
+    }
+    if (!is_string($passwordConfirm) || $passwordConfirm !== $password) {
+        $err[] = 'password_confirm';
+    }
+    return $err;
+}
+
+/**
  * id entier strictement positif.
  * @return bool
  */

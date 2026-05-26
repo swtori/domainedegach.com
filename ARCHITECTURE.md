@@ -1,122 +1,198 @@
-# Architecture du Projet - Domaine de Gach
+# Architecture — Domaine de Gach
 
-## Vue d'ensemble
+Document de référence pour la structure du dépôt, le **back-office PHP** (MVC léger) et les flux de données. Pour l’installation et l’usage, voir [`README.md`](README.md).
 
-Le projet est composé de :
-- un **site vitrine** statique (HTML/CSS/JS)
-- un **back-office PHP** en architecture **MVC légère** pour la gestion des clients et des réservations
-- une base **MySQL** initialisée via `php/gachDb.sql`
+---
+
+## Vue d’ensemble
+
+| Couche | Rôle |
+|--------|------|
+| **Site vitrine** | Pages HTML statiques, `css/`, `js/`, `img/` — présentation du gîte. |
+| **Back-office** | PHP : authentification, gestion **clients** et **réservations** ; lecture des **chambres**. |
+| **Persistance** | MySQL, accès via **PDO** et scripts SQL (`php/gachDb.sql`). |
+| **Tests** | PHPUnit + SQLite en mémoire (`tests/`), optionnel. |
+
+---
 
 ## Arborescence utile
 
 ```text
-domainedegach.com/
+domaineDeGach/
+├── README.md
+├── ARCHITECTURE.md
+├── phpunit.xml
 ├── index.html
 ├── chambres.html
-├── chambre-suite.html
-├── chambre-denis.html
-├── chambre-creole.html
-├── chambre-geo.html
+├── chambre-*.html
 ├── autour.html
 ├── localiser.html
 ├── contact.html
 ├── mentions-legales.html
-├── README.md
-├── ARCHITECTURE.md
 ├── css/
 │   └── style.css
 ├── js/
 │   ├── main.js
 │   ├── carousel.js
 │   └── contact.js
+├── img/                          # Médias du site public (sous-dossiers par thème)
+├── tests/
+│   ├── bootstrap.php             # SQLite + schéma minimal pour PHPUnit
+│   └── ReservationModelTest.php
 ├── php/
-│   ├── index.php
-│   ├── content.php
-│   ├── gachDb.sql
-│   ├── modeleRelationnel.txt
+│   ├── index.php                 # Point d’entrée back-office
+│   ├── content.php               # (héritage / utilitaires selon déploiement)
+│   ├── gachDb.sql                # Création BDD + jeux d’essais
 │   ├── sql/
-│   │   ├── MCD.jpg
-│   │   └── diagrammeRelationnel.png
+│   │   ├── gachDb.sql            # Copie / variante documentaire
+│   │   ├── modeleRelationnel.txt
+│   │   └── lien.txt
 │   ├── Config/
-│   │   └── database.php
+│   │   ├── database.php          # PDO MySQL, constantes + getPdo()
+│   │   └── env.local.php         # Mot de passe BDD (local, non versionné)
 │   ├── Controller/
-│   │   └── requests.php
+│   │   ├── requests.php          # Contrôleur principal (utilisé en production)
+│   │   ├── clientRequests.php    # Non branché sur index (refactor possible)
+│   │   ├── reservationRequests.php
+│   │   ├── chambreRequests.php
+│   │   └── controllerHelpers.php
 │   ├── Model/
-│   │   ├── chambreModel.php
-│   │   ├── clientModel.php
-│   │   ├── reservationModel.php
-│   │   └── userModel.php
+│   │   ├── chambreModel.php      # Lecture des chambres
+│   │   ├── clientModel.php       # CRUD clients + unicité email
+│   │   ├── reservationModel.php  # CRUD réservations + chevauchement
+│   │   └── userModel.php         # USERS, password_verify
 │   ├── Validation/
-│   │   └── validators.php
+│   │   └── validators.php        # Règles serveur (email, tel, dates, ids)
 │   └── Views/
 │       ├── loginView.php
-│       └── showView.php
-└── img/
-    └── ... (ressources médias du site)
+│       └── showView.php          # Admin : tableaux + formulaires
+└── .github/
+    └── workflows/
+        └── static.yml             # Déploiement GitHub Pages (vitrine statique)
 ```
 
-## Architecture MVC (back-office)
+Les fichiers `*Requests.php` (hors `requests.php`) sont des **brouillons de découpage** : seul **`requests.php`** est chargé par `index.php`. Tu peux soit les supprimer, soit y déléguer progressivement la logique POST.
 
-### 1) Point d'entrée
-- `php/index.php`
-- Démarre la session sécurisée et charge le contrôleur principal.
+---
 
-### 2) Contrôleur
-- `php/Controller/requests.php`
-- Rôle :
-  - lire les requêtes `GET/POST`
-  - appliquer les validations
-  - appeler les modèles
-  - gérer la connexion/déconnexion
-  - rediriger avec messages de succès/erreur
-  - choisir la vue à afficher
+## MVC back-office
 
-### 3) Modèles
-- `php/Model/chambreModel.php` : lecture des chambres
-- `php/Model/clientModel.php` : CRUD clients
-- `php/Model/reservationModel.php` : CRUD réservations + vérification chevauchement
-- `php/Model/userModel.php` : authentification admin (`USERS`, `password_hash`, `password_verify`)
+### 1. Point d’entrée — `php/index.php`
 
-### 4) Validation
-- `php/Validation/validators.php`
-- Validation serveur des champs : email, téléphone, dates, identifiants positifs, cohérence des périodes.
+- Configure les paramètres du cookie de session (`httponly`, `secure` si HTTPS, `samesite`).
+- Démarre `session_start()` si nécessaire.
+- Inclut **`Controller/requests.php`**.
 
-### 5) Vues
-- `php/Views/loginView.php` : formulaire de connexion
-- `php/Views/showView.php` : interface d'administration (chambres, clients, réservations)
+### 2. Contrôleur — `php/Controller/requests.php`
 
-### 6) Configuration BDD
-- `php/Config/database.php`
-- Connexion PDO MySQL avec :
-  - constantes de connexion (`DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`)
-  - mot de passe depuis `php/Config/env.local.php` (ou variable d'environnement)
+- **Sans session valide** (hors action login) : affiche `loginView.php`.
+- **POST `action=login`** : validation légère des champs → `userModel_verifyLogin` → redirection ou erreur.
+- **GET `action=logout`** : destruction de session → redirection.
+- **Utilisateur connecté + POST** : routage selon `action` :
+  - `add_client`, `update_client`, `delete_client`
+  - `add_reservation`, `update_reservation`, `delete_reservation`
+- Après traitement : **`header('Location: …?success=…')`** ou **`?error=…`** (PRG : Post/Redirect/Get).
+- **GET `edit_client` / `edit_reservation`** : charge l’entité pour préremplir les formulaires dans la vue.
+- En fin de script : charge les listes via les modèles puis **`Views/showView.php`**.
 
-## Schéma de données
+### 3. Modèles — `php/Model/*.php`
 
-- Script SQL : `php/gachDb.sql`
-- Tables principales :
-  - `CLIENTS`
-  - `CHAMBRES`
-  - `RESERVATIONS`
-  - `USERS`
-- Relations :
-  - `RESERVATIONS.idClient` -> `CLIENTS.id`
-  - `RESERVATIONS.idChambre` -> `CHAMBRES.id`
+Fonctions procédurales ; chaque fichier regroupe l’accès à une table (ou un domaine).
 
-## Flux de traitement (résumé)
+| Fichier | Responsabilité |
+|---------|------------------|
+| `chambreModel.php` | `chambreModel_getAll()` |
+| `clientModel.php` | CRUD + `emailTakenByOther`, `getById` |
+| `reservationModel.php` | CRUD + `hasOverlap`, `foreignKeysExist`, `getById` |
+| `userModel.php` | Connexion, création utilisateur (hash) |
 
-1. L'utilisateur ouvre `php/index.php`.
-2. Le contrôleur vérifie la session.
-3. En POST, il valide les données puis appelle les modèles.
-4. Les modèles exécutent les requêtes SQL (PDO).
-5. Le contrôleur redirige avec un message (`success` / `error`).
-6. La vue `showView.php` affiche l'état courant.
+Toutes les requêtes passent par **`getPdo()`** (`database.php`) avec **requêtes préparées** lorsque des paramètres sont injectés.
 
-## Sécurité déjà en place
+### 4. Validation — `php/Validation/validators.php`
 
-- Requêtes préparées PDO
-- Mots de passe hashés (`password_hash` / `password_verify`)
-- Session avec cookie `httponly` et `samesite`
-- Échappement HTML dans les vues (`htmlspecialchars`)
-- Validations serveur sur les formulaires
+Appelée **avant** les modèles dans le contrôleur : email (`filter_var`), téléphone, dates `Y-m-d`, plage réservation (sortie > entrée), entiers strictement positifs pour les `id`.
 
+### 5. Vues — `php/Views/*.php`
+
+- **`loginView.php`** : formulaire identifiant / mot de passe ; styles intégrés.
+- **`showView.php`** : en-tête, cartes par section (chambres, clients, réservations), tableaux, formulaires, messages flash selon `$_GET['success']` / `$_GET['error']` ; styles intégrés.
+
+Aucun moteur de templates : PHP “nu” avec échappement **`htmlspecialchars`** sur les données utilisateur.
+
+### 6. Configuration — `php/Config/database.php`
+
+- Constantes `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_CHARSET`.
+- Mot de passe : `env.local.php` ou variable d’environnement `GACH_DB_PASS`.
+- **`getPdo()`** : singleton statique, `ERRMODE_EXCEPTION`, retourne `null` en cas d’échec (la vue affiche un message générique).
+
+---
+
+## Schéma de données (logique)
+
+- **Script principal** : `php/gachDb.sql`
+- **Tables** : `CLIENTS`, `CHAMBRES`, `RESERVATIONS`, `USERS`
+- **Relations** :
+  - `RESERVATIONS.idClient` → `CLIENTS.id` (ON DELETE CASCADE selon script)
+  - `RESERVATIONS.idChambre` → `CHAMBRES.id`
+
+**Règle métier** : deux réservations sur la **même chambre** ne peuvent pas avoir des périodes qui se chevauchent (voir `reservationModel_hasOverlap`).
+
+Documentation textuelle complémentaire : `php/sql/modeleRelationnel.txt`.
+
+---
+
+## Flux de requête (résumé)
+
+```mermaid
+flowchart LR
+  A[index.php] --> B[requests.php]
+  B --> C{Session ?}
+  C -->|Non| D[loginView]
+  C -->|Oui| E{POST ?}
+  E -->|Oui| F[validators + models]
+  F --> G[Redirect GET]
+  E -->|Non| H[Load lists]
+  H --> I[showView]
+  G --> B
+```
+
+1. Le navigateur appelle `index.php`.
+2. Le contrôleur vérifie la session et traite login / logout.
+3. Si **POST** métier : validation → modèle → **redirection** avec paramètre de flash.
+4. Si **GET** (ou après redirect) : rechargement des données → **showView**.
+
+---
+
+## Tests automatisés
+
+- **`phpunit.xml`** : bootstrap `tests/bootstrap.php`.
+- **`tests/bootstrap.php`** : crée une base **SQLite** en mémoire, tables alignées sur le schéma métier minimal, charge les modèles.
+- **`tests/ReservationModelTest.php`** : exemple sur `reservationModel_hasOverlap` et clés étrangères.
+
+Lancer : `vendor/bin/phpunit` (après `composer require --dev phpunit/phpunit`). Voir `README.md`.
+
+---
+
+## Sécurité (rappel)
+
+| Mesure | Où |
+|--------|-----|
+| PDO préparé | Modèles |
+| `password_hash` / `password_verify` | `userModel.php` |
+| Cookie session `httponly`, `samesite`, `secure` adaptatif | `index.php` |
+| `session_regenerate_id` après login | `requests.php` |
+| `htmlspecialchars` | Vues |
+| Validation serveur | `validators.php` + contrôleur |
+
+**Pistes d’amélioration** : jetons **CSRF** sur les formulaires POST, ne pas exposer d’identifiants BDD inutiles dans le dépôt, limitation des tentatives de connexion.
+
+---
+
+## Déploiement
+
+- **GitHub Pages** (workflow `static.yml`) : adapté au site **HTML/CSS/JS** ; **pas d’exécution PHP**.
+- **Hébergement PHP + MySQL** : nécessaire pour `index.php`, `Config`, et la base distante.
+
+---
+
+*Dernière mise à jour : alignée sur la structure du dépôt et le contrôleur `requests.php`.*
